@@ -5,7 +5,10 @@ var path  = require('path');
 
 module.exports = function (context, options) {
   function ppStream(file, callback) {
-    var contents, extension;
+    var contents, extension, opts;
+
+    opts = _.merge({}, options);
+    opts.type = _.isEmpty(opts.type) ? getExtension(file.path) : opts.type;
 
     // TODO: support streaming files
     if (file.isNull()) return callback(null, file); // pass along
@@ -17,6 +20,11 @@ module.exports = function (context, options) {
     file.contents = new Buffer(contents);
 
     callback(null, file);
+  }
+
+  function getExtension(filename) {
+    var ext = path.extname(filename||'').split('.');
+    return ext[ext.length - 1];
   }
 
   return map(ppStream);
